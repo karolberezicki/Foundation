@@ -15,20 +15,23 @@ if "%~1" == "" goto loop
 
 set APPNAME=%~1
 set SQLSERVER=%~2
-set ADDITIONAL_SQLCMD=%~3
+set DBUSER=%~3
+set DBPASSWORD=%~4
 goto main
 
 :loop
 set SQLSERVER=
-set ADDITIONAL_SQLCMD=
 set /p APPNAME=Enter your app name (required):
 set /p SQLSERVER=Enter your SQL server name (optional, press Enter for default (.) local server):
-set /p ADDITIONAL_SQLCMD=Enter your sqlcmd command (optional, press Enter for default (-E) windows auth):
+set /p DBUSER=Enter database user name (required):
+set /p DBPASSWORD=Enter database password (required):
 
 set check=false
 if "%APPNAME%"=="" (set check=true)
+if "%DBUSER%"=="" (set check=true)
+if "%DBPASSWORD%"=="" (set check=true)
 if "%check%"=="true" (
-	echo Parameters missing, application name is required, foundation domain name, commerce manager domain name and LICENSE path are optional
+	echo Parameters missing, application name, database user and database password are required
 	pause
 	cls
 	goto loop
@@ -36,18 +39,17 @@ if "%check%"=="true" (
 
 :main
 if "%SQLSERVER%"=="" (set SQLSERVER=.)
-if "%ADDITIONAL_SQLCMD%"=="" (set ADDITIONAL_SQLCMD=-E)
 
 cls
 echo Your application name is: %APPNAME%
 echo Your SQL server name is: %SQLSERVER%
-echo Your SQLCMD command is: sqlcmd -S %SQLSERVER% %ADDITIONAL_SQLCMD%
+echo Your database user is: %DBUSER%
 timeout 15
 
 set cms_db=%APPNAME%.Cms
 set commerce_db=%APPNAME%.Commerce
-set user=%cms_db%User
-set password=Episerver123!
+set user=%DBUSER%
+set password=%DBPASSWORD%
 set errorMessage = "" 
 
 cls
@@ -99,10 +101,10 @@ CALL npm run dev
 cd %ROOTPATH%
 
 echo ## Clean and build ##
-echo ## Clean and build ## >> Build\Logs\Build.log				 
+echo ## Clean and build ## >> Build\Logs\Build.log
 "%InstallDir%%msBuildPath%" Foundation.sln /t:Clean,Build  >> Build\Logs\Build.log
 
-set sql=sqlcmd -S %SQLSERVER% %ADDITIONAL_SQLCMD%
+set sql=sqlcmd -S %SQLSERVER% -U %DBUSER% -P %DBPASSWORD%
 echo ## %sql% ##
 
 echo ## Dropping databases ##
@@ -119,8 +121,8 @@ echo ## Dropping user ## >> Build\Logs\Database.log
 %sql% -Q "if exists (select loginname from master.dbo.syslogins where name = '%user%') EXEC sp_droplogin @loginame='%user%'" >> Build\Logs\Database.log
 
 dotnet tool update EPiServer.Net.Cli --global --add-source https://nuget.optimizely.com/feed/packages.svc/
-dotnet-episerver create-cms-database ".\src\Foundation\Foundation.csproj" -S "%SQLSERVER%" %ADDITIONAL_SQLCMD%  --database-name "%APPNAME%.Cms"
-dotnet-episerver create-commerce-database ".\src\Foundation\Foundation.csproj" -S "%SQLSERVER%" %ADDITIONAL_SQLCMD%  --database-name "%APPNAME%.Commerce" --reuse-cms-user
+dotnet-episerver create-cms-database ".\src\Foundation\Foundation.csproj" -S "%SQLSERVER%" -U %DBUSER% -P %DBPASSWORD% -du %DBUSER% -dp %DBPASSWORD% --database-name "%APPNAME%.Cms"
+dotnet-episerver create-commerce-database ".\src\Foundation\Foundation.csproj" -S "%SQLSERVER%" -U %DBUSER% -P %DBPASSWORD%  --database-name "%APPNAME%.Commerce" --reuse-cms-user
 
 echo ## Installing foundation configuration ##
 echo ## Installing foundation configuration ## >> Build\Logs\Database.log
@@ -147,6 +149,6 @@ echo echo #       Crtl+C NOW if you are unsure!                                #
 echo echo #                                                                    # >> resetup.cmd
 echo echo ###################################################################### >> resetup.cmd
 echo pause >> resetup.cmd
-echo setup %APPNAME% %SQLSERVER% "%ADDITIONAL_SQLCMD%" >> resetup.cmd
+echo setup %APPNAME% %SQLSERVER% %DBUSER% %DBPASSWORD% >> resetup.cmd
 
 pause
