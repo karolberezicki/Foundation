@@ -16,8 +16,6 @@
 
         public Guid ContentGuid { get; set; }
 
-        public int ContentTypeID { get; set; }
-
         public bool IsDeleted { get; set; }
     }
 }
