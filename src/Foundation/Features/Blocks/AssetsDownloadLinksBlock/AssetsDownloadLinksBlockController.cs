@@ -17,24 +17,17 @@ namespace Foundation.Features.Blocks.AssetsDownloadLinksBlock
         [HttpGet("Download/{contentLinkId}")]
         public IActionResult Download(int contentLinkId)
         {
-            var mediaData = _contentLoader.Get<IContent>(new ContentReference(contentLinkId)) as MediaData;
-            if (mediaData != null)
+            if (_contentLoader.Get<IContent>(new ContentReference(contentLinkId))
+                is MediaData { BinaryData: FileBlob { FilePath: not null } blob } mediaData)
             {
-                var downloadFile = mediaData;
-                if (downloadFile != null)
-                {
-                    var blob = downloadFile.BinaryData as FileBlob;
-                    if (blob != null)
-                    {
-                        var routeSegment = downloadFile.RouteSegment;
-                        var extension = Path.GetExtension(blob.FilePath) ?? "";
-                        var downloadFileName = routeSegment.EndsWith(extension) ? routeSegment : routeSegment + extension;
+                var routeSegment = mediaData.RouteSegment;
+                var extension = Path.GetExtension(blob.FilePath);
+                var fileName = routeSegment.EndsWith(extension) ? routeSegment : routeSegment + extension;
 
-                        HttpContext.Response.Headers.Add("content-disposition", "attachment;filename=" + Path.GetFileName(downloadFileName));
-                        return File(System.IO.File.ReadAllBytes(blob.FilePath), "application/octet-stream");
-                    }
-                }
+                HttpContext.Response.Headers.Append("content-disposition", "attachment;filename=" + Path.GetFileName(fileName));
+                return File(System.IO.File.ReadAllBytes(blob.FilePath), "application/octet-stream");
             }
+
             return null;
         }
     }
