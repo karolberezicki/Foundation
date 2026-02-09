@@ -12,7 +12,6 @@
     <PackageReference Include="EPiServer.CMS.AspNetCore.TagHelpers" Version="12.23.1" />
     <PackageReference Include="EPiServer.CMS.AspNetCore.Templating" Version="12.23.1" />
     <PackageReference Include="EPiServer.CMS.TinyMce" Version="5.0.3" />
-    <PackageReference Include="EPiServer.CMS.WelcomeIntegration.UI" Version="2.1.7" />
     <PackageReference Include="EPiServer.Commerce" Version="14.45.1" />
     <PackageReference Include="EPiServer.Hosting" Version="12.23.1" />
     <PackageReference Include="EPiServer.ImageLibrary.ImageSharp" Version="2.0.5" />

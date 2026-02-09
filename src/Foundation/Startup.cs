@@ -207,9 +207,6 @@ namespace Foundation
 
             services.AddGetaCategories();
 
-            // Add Welcome DAM
-            services.AddDAMUi();
-
             //Configure GeoLocation for Visitor Groups, etc
             services.AddMaxMindGeolocationProvider(o =>
             {
