@@ -89,3 +89,5 @@ src/Foundation/modules/
 /src/Foundation/wwwroot/scss/main.min.css.map
 /log.txt
 .idea
+src/Foundation/wwwroot/js
+src/Foundation/wwwroot/vendors
