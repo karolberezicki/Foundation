@@ -32,7 +32,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Optimizely.Labs.MarketingAutomationIntegration.ODP;
 using System.IO;
-using TinymceDamPicker;
 using UNRVLD.ODP.VisitorGroups.Initilization;
 
 namespace Foundation
@@ -238,12 +237,8 @@ namespace Foundation
             // https://github.com/episerver/content-ab-testing
             services.AddABTesting(_configuration.GetConnectionString("EPiServerDB"));
 
-
             // Project Enhancements
             services.AddProjectEnhancements();
-
-            // Adds the DAM selector button
-            services.AddDamSelectButton();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
