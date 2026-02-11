@@ -45,23 +45,22 @@
     }
     <br />
     <div class="row">
-        <d>
-            @if (Model.HasOrganization)
+        @if (Model.HasOrganization)
+        {
+            using (@Html.BeginForm("RequestWishListQuote", "WishList", FormMethod.Post, new { @style = "display: inline-block; margin-right: 15px" }))
             {
-                using (@Html.BeginForm("RequestWishListQuote", "WishList", FormMethod.Post, new { @style = "display: inline-block; margin-right: 15px" }))
-                {
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="button-transparent-black">
-                        <span>@Html.TranslateFallback("/Shared/RequestQuote", "Request Quote")</span>
-                    </button>
-                }
+                @Html.AntiForgeryToken()
+                <button type="submit" class="button-transparent-black">
+                    <span>@Html.TranslateFallback("/Shared/RequestQuote", "Request Quote")</span>
+                </button>
             }
-            <button class="button-transparent-black--icon jsAddAllToCart" title="Add All to Cart" type="button" url="@Url.Action("AddAllToCart")">
-                <span>
-                    <i data-feather="plus"></i>
-                    @Html.TranslateFallback("/WishList/AddAll", "Add to Cart")
-                </span>
-            </button>
+        }
+        <button class="button-transparent-black--icon jsAddAllToCart" title="Add All to Cart" type="button" url="@Url.Action("AddAllToCart")">
+            <span>
+                <i data-feather="plus"></i>
+                @Html.TranslateFallback("/WishList/AddAll", "Add to Cart")
+            </span>
+        </button>
     </div>
 }
 else
