@@ -70,12 +70,6 @@
 	  <EmbeddedResource Include="lang\**\*" />
 	  <None Update="App_Data\**" CopyToOutputDirectory="PreserveNewest" />
 	  <None Update="modules\_protected\Foundation\**" CopyToOutputDirectory="PreserveNewest" />
-	  <Compile Remove="Infrastructure\Plugins\**" />
-	  <Content Remove="Infrastructure\Plugins\**" />
-	  <EmbeddedResource Remove="Infrastructure\Plugins\**" />
-	  <Compile Remove="Infrastructure\Display\FoundationDisplayModeProvider.cs" />
-	  <Compile Remove="Infrastructure\Kpi\FilledInFormKpi.cs" />
-	  <Folder Include="Infrastructure\Kpi\" />
 	  <Folder Include="wwwroot\" />
   </ItemGroup>
 </Project>

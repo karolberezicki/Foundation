@@ -1,6 +1,4 @@
-﻿//using EPiBootstrapArea;
-//using EPiBootstrapArea.Initialization;
-using EPiServer.Commerce.Internal.Migration;
+﻿using EPiServer.Commerce.Internal.Migration;
 using EPiServer.Commerce.Marketing.Internal;
 using EPiServer.Find.ClientConventions;
 using EPiServer.Find.Commerce;
@@ -63,7 +61,6 @@ namespace Foundation.Infrastructure
                 return factory.GetUrlHelper(actionContext);
             });
 
-            //_services.AddSingleton<IDisplayModeFallbackProvider, FoundationDisplayModeProvider>();
             _services.AddTransient<IQuickNavigatorItemProvider, FoundationQuickNavigatorItemProvider>();
             _services.AddTransient<IViewTemplateModelRegistrator, ViewTemplateModelRegistrator>();
             _services.AddSingleton<DefaultPlacedPriceProcessor, FoundationPlacedPriceProcessor>();
