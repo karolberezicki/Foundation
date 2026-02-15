@@ -23,11 +23,6 @@
                     @Html.TranslateFallback("/Shared/ProductDescription", "Product Description")
                 </a>
             </li>
-            @*<li class="nav-item">
-                <a class="nav-link product-tab__item" data-bs-toggle="tab" href="#product_tabs_reviews">
-                    @Html.TranslateFallback("/Shared/Reviews", "Reviews")
-                </a>
-            </li>*@
             <li class="nav-item">
                 <a class="nav-link product-tab__item" data-bs-toggle="tab" href="#product_tabs_associations">
                     @if (!string.IsNullOrEmpty(Model.CurrentContent.AssociationsTitle) || Html.IsInEditMode())
@@ -45,12 +40,6 @@
             <div class="tab-pane product-tab__content fade in active show" id="product_tabs_description">
                 @Html.PropertyFor(x => x.CurrentContent.Description)
             </div>
-            @*<div class="tab-pane product-tab__content fade" id="product_tabs_reviews">
-                @await Html.PartialAsync("_ReviewForm", new ReviewSubmissionViewModel(Model.CurrentContent.Code))-->
-                <div>
-                        @Html.Partial("_Reviews", Model.Reviews)
-                    </div>
-            </div>*@
             <div class="tab-pane product-tab__content product-tab__association fade" id="product_tabs_associations">
                 <div class="row">
                     @foreach (var association in Model.StaticAssociations.Take(4))

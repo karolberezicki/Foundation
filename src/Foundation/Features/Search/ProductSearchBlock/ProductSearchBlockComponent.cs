@@ -13,21 +13,18 @@ namespace Foundation.Features.Search.ProductSearchBlock;
 public class ProductSearchBlockComponent : AsyncBlockComponent<ProductSearchBlock>
 {
     private readonly LanguageService _languageService;
-    //private readonly IReviewService _reviewService;
     private readonly ICurrentMarket _currentMarket;
     private readonly ICurrencyService _currencyService;
     private readonly ISearchService _searchService;
     private readonly ReportingDataLoader _reportingDataLoader;
 
     public ProductSearchBlockComponent(LanguageService languageService,
-        //IReviewService reviewService,
         ICurrentMarket currentMarket,
         ICurrencyService currencyService,
         ISearchService searchService,
         ReportingDataLoader reportingDataLoader)
     {
         _languageService = languageService;
-        //_reviewService = reviewService;
         _currentMarket = currentMarket;
         _currencyService = currencyService;
         _searchService = searchService;
@@ -124,7 +121,6 @@ public class ProductSearchBlockComponent : AsyncBlockComponent<ProductSearchBloc
 
         var market = _currentMarket.GetCurrentMarket();
         var currency = _currencyService.GetCurrentCurrency();
-        //var ratings = _reviewService.GetRatings(products.Select(x => x.Code)) ?? null;
         var newList = result.ProductViewModels.ToList();
         newList.InsertRange(0, products.Select(document => document.GetProductTileViewModel(market, currency)));
         result.ProductViewModels = newList;

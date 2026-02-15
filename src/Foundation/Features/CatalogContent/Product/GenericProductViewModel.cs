@@ -13,7 +13,6 @@ public class GenericProductViewModel : ProductViewModelBase<GenericProduct, Gene
     {
     }
 
-    //public ReviewsViewModel Reviews { get; set; }
     public IEnumerable<Recommendation> AlternativeProducts { get; set; }
     public IEnumerable<Recommendation> CrossSellProducts { get; set; }
 }

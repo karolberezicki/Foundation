@@ -12,7 +12,6 @@ public class GenericPackageViewModel : PackageViewModelBase<GenericPackage>, IEn
     {
     }
 
-    //public ReviewsViewModel Reviews { get; set; }
     public IEnumerable<Recommendation> AlternativeProducts { get; set; }
     public IEnumerable<Recommendation> CrossSellProducts { get; set; }
 }

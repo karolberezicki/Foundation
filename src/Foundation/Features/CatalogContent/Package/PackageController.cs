@@ -12,13 +12,11 @@ public class PackageController : CatalogContentControllerBase<GenericPackage>
 
     public PackageController(IsInEditModeAccessor isInEditModeAccessor,
         CatalogEntryViewModelFactory viewModelFactory,
-        //IReviewService reviewService,
-        //IReviewActivityService reviewActivityService,
         ICommerceTrackingService recommendationService,
         ReferenceConverter referenceConverter,
         IContentLoader contentLoader,
         UrlResolver urlResolver,
-        ILoyaltyService loyaltyService) : base(referenceConverter, contentLoader, urlResolver/*, reviewService, reviewActivityService*/, recommendationService, loyaltyService)
+        ILoyaltyService loyaltyService) : base(referenceConverter, contentLoader, urlResolver, recommendationService, loyaltyService)
     {
         _isInEditMode = isInEditModeAccessor();
         _viewModelFactory = viewModelFactory;

@@ -42,7 +42,6 @@ public class CatalogEntryViewModelFactory
         ICurrencyService currencyservice,
         IRelationRepository relationRepository,
         UrlResolver urlResolver,
-        //FilterPublished filterPublished,
         IContentLanguageAccessor contentLanguageAccessor,
         IStoreService storeService,
         IProductService productService,
@@ -326,7 +325,6 @@ public class CatalogEntryViewModelFactory
         viewModel.IsAvailable = _databaseMode.DatabaseMode != DatabaseMode.ReadOnly && defaultPrice != null && isInstock;
         viewModel.Entries = variants;
         viewModel.EntriesRelation = entries;
-        //Reviews = GetReviews(currentContent.Code);
         viewModel.Stores = new StoreViewModel
         {
             Stores = _storeService.GetEntryStoresViewModels(currentContent.Code),

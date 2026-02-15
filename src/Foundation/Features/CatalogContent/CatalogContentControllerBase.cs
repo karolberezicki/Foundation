@@ -10,24 +10,18 @@ public class CatalogContentControllerBase<T> : ContentController<T> where T : Ca
     protected readonly ReferenceConverter _referenceConverter;
     protected readonly IContentLoader _contentLoader;
     protected readonly UrlResolver _urlResolver;
-    //protected readonly IReviewService _reviewService;
-    //protected readonly IReviewActivityService _reviewActivityService;
     protected readonly ICommerceTrackingService _recommendationService;
     protected readonly ILoyaltyService _loyaltyService;
 
     public CatalogContentControllerBase(ReferenceConverter referenceConverter,
         IContentLoader contentLoader,
         UrlResolver urlResolver,
-        //IReviewService reviewService,
-        //IReviewActivityService reviewActivityService,
         ICommerceTrackingService recommendationService,
         ILoyaltyService loyaltyService)
     {
         _referenceConverter = referenceConverter;
         _contentLoader = contentLoader;
         _urlResolver = urlResolver;
-        //_reviewService = reviewService;
-        //_reviewActivityService = reviewActivityService;
         _recommendationService = recommendationService;
         _loyaltyService = loyaltyService;
     }
@@ -64,56 +58,8 @@ public class CatalogContentControllerBase<T> : ContentController<T> where T : Ca
         return model;
     }
 
-    //protected void AddActivity(string product,
-    //    int rating,
-    //    string user)
-    //{
-    //    // Create the review activity
-    //    var activity = new ReviewActivity
-    //    {
-    //        Product = product,
-    //        Rating = rating,
-    //        Contributor = user,
-    //    };
-
-    //    // Add the review activity 
-    //    _reviewActivityService.Add(user, product, activity);
-    //}
-
-    //protected ReviewsViewModel GetReviews(string productCode) =>
-
-    //    //Testing to query FIND with GetRatingAverage
-    //    //var searchClient = Client.CreateFromConfig();
-    //    //var contentResult = searchClient.Search<FashionProduct>()
-    //    //                .Filter(c => c.GetRatingAverage().GreaterThan(0))
-    //    //                .OrderByDescending(c => c.GetRatingAverage()).Take(25)
-    //    //                .GetContentResult();
-
-    //    // Return reviews for the product with the ReviewService
-    //    _reviewService.Get(productCode);
-
-    //[HttpPost]
-    //[ValidateAntiForgeryToken]
-    //public ActionResult AddAReview(ReviewSubmissionViewModel reviewForm)
-    //{
-    //    // Invoke the ReviewService to add the submission
-    //    try
-    //    {
-    //        var model = _reviewService.Add(reviewForm);
-    //        //Loyalty Program: Add Points and Number Of Reviews
-    //        _loyaltyService.AddNumberOfReviews();
-    //        AddActivity(reviewForm.ProductCode, reviewForm.Rating, reviewForm.Nickname);
-    //        return PartialView("_ReviewItem", model);
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        return StatusCode(HttpStatusCode.InternalServerError, e.Message);
-    //    }
-    //}
-
     protected async Task AddInfomationViewModel(IEntryViewModelBase viewModel, string productCode, bool skipTracking)
     {
-        //viewModel.Reviews = GetReviews(productCode);
         var trackingResponse = new TrackingResponseData();
         if (!skipTracking)
         {
