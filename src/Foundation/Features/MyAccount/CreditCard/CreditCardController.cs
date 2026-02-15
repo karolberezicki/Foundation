@@ -46,14 +46,6 @@ public class CreditCardController : PageController<CreditCardPage>
     [HttpGet]
     public ActionResult Index(CreditCardPage currentPage) =>  List(currentPage);
 
-    ///// <summary>
-    ///// List all credit card of current user, with b2b navigation on view
-    ///// </summary>
-    ///// <param name="currentPage">Current credit card page</param>
-    ///// <returns></returns>
-    //[NavigationAuthorize("Admin")]
-    //public ActionResult B2B(CreditCardPage currentPage) => List(currentPage);
-
     /// <summary>
     /// List all credit card of current user
     /// </summary>

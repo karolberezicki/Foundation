@@ -3,7 +3,7 @@ using System.Net.Mail;
 
 namespace Foundation.Features.Shared;
 
-public interface IMailService/* : IIdentityMessageService*/
+public interface IMailService
 {
     void Send(string subject, string body, string toEmail);
     void Send(MailMessage message);
@@ -94,16 +94,4 @@ public class MailService : IMailService
         }
     }
 
-    //public async Task SendAsync(IdentityMessage message)
-    //{
-    //    var msg = new MailMessage
-    //    {
-    //        Subject = message.Subject,
-    //        Body = message.Body,
-    //        IsBodyHtml = true
-    //    };
-
-    //    msg.To.Add(message.Destination);
-    //    await SendAsync(msg);
-    //}
 }

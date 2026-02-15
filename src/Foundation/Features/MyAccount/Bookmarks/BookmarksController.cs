@@ -12,7 +12,6 @@ public class BookmarksController : PageController<BookmarksPage>
         _bookmarksService = bookmarksService;
     }
 
-    //[PageViewTracking]
     public ActionResult Index(BookmarksPage currentPage)
     {
         var model = new BookmarksViewModel(currentPage)
@@ -24,24 +23,4 @@ public class BookmarksController : PageController<BookmarksPage>
         return View(model);
     }
 
-    //[HttpPost]
-    //public ActionResult Bookmark(Guid contentId)
-    //{
-    //    _bookmarksService.Add(contentId);
-    //    return Json(new { Success = true });
-    //}
-
-    //[HttpPost]
-    //public ActionResult Unbookmark(Guid contentId)
-    //{
-    //    _bookmarksService.Remove(contentId);
-    //    return Json(new { Success = true });
-    //}
-
-    //[HttpPost]
-    //public ActionResult Remove(Guid contentGuid)
-    //{
-    //    _bookmarksService.Remove(contentGuid);
-    //    return Json(new { Success = true });
-    //}
 }

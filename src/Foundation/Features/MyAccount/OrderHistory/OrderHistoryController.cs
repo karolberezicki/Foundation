@@ -58,14 +58,6 @@ public class OrderHistoryController : OrderConfirmationControllerBase<OrderHisto
     [AcceptVerbs(new string[] { "GET", "POST" })]
     public ActionResult Index(OrderHistoryPage currentPage, OrderFilter filter, int? page, int? size, int? isPaging)
     {
-        //if (isPaging.HasValue)
-        //{
-        //    filter = GetFilter();
-        //}
-        //else
-        //{
-        //    SetCookieFilter(filter);
-        //}
         var pageNum = page ?? 1;
         var pageSize = size ?? 10;
         var orders = _orderRepository.Load<IPurchaseOrder>(PrincipalInfo.CurrentPrincipal.GetContactId(), _cartService.DefaultCartName);
@@ -260,95 +252,4 @@ public class OrderHistoryController : OrderConfirmationControllerBase<OrderHisto
         return result;
     }
 
-    private void SetCookieFilter(OrderFilter filter)
-    {
-        _cookieService.Set(_KEYWORD, filter.Keyword);
-        _cookieService.Set(_DATEFROM, filter.DateFrom.ToString());
-        _cookieService.Set(_DATETO, filter.DateTo.ToString());
-        _cookieService.Set(_ORDERSTATUS, filter.OrderStatusId.ToString());
-        _cookieService.Set(_PRICEFROM, filter.PriceFrom.ToString());
-        _cookieService.Set(_PRICETO, filter.PriceTo.ToString());
-        _cookieService.Set(_PURCHASENUMBER, filter.PurchaseOrderNumber);
-        _cookieService.Set(_ORDERGROUPID, filter.OrderGroupId);
-        _cookieService.Set(_SHIPPINGADDRESS, filter.AddressId);
-    }
-
-    private OrderFilter GetFilter()
-    {
-        var filter = new OrderFilter
-        {
-            Keyword = _cookieService.Get(_KEYWORD)
-        };
-
-        var dateFromStr = _cookieService.Get(_DATEFROM);
-        if (!string.IsNullOrEmpty(dateFromStr))
-        {
-            if (DateTime.TryParse(dateFromStr, out var dateFrom))
-            {
-                filter.DateFrom = dateFrom;
-            }
-            else
-            {
-                filter.DateFrom = null;
-            }
-        }
-
-        var dateToStr = _cookieService.Get(_DATETO);
-        if (!string.IsNullOrEmpty(dateToStr))
-        {
-            if (DateTime.TryParse(dateToStr, out var dateTo))
-            {
-                filter.DateTo = dateTo;
-            }
-            else
-            {
-                filter.DateTo = null;
-            }
-        }
-
-        var priceFromStr = _cookieService.Get(_PRICEFROM);
-        if (!string.IsNullOrEmpty(priceFromStr))
-        {
-            if (decimal.TryParse(priceFromStr, out var priceFrom))
-            {
-                filter.PriceFrom = priceFrom;
-            }
-            else
-            {
-                filter.PriceFrom = 0;
-            }
-        }
-
-        var priceToStr = _cookieService.Get(_PRICETO);
-        if (!string.IsNullOrEmpty(priceToStr))
-        {
-            if (decimal.TryParse(priceToStr, out var priceTo))
-            {
-                filter.PriceTo = priceTo;
-            }
-            else
-            {
-                filter.PriceTo = 0;
-            }
-        }
-
-        var orderStatusStr = _cookieService.Get(_ORDERSTATUS);
-        if (!string.IsNullOrEmpty(orderStatusStr))
-        {
-            if (int.TryParse(orderStatusStr, out var status))
-            {
-                filter.OrderStatusId = status;
-            }
-            else
-            {
-                filter.OrderStatusId = 0;
-            }
-        }
-
-        filter.PurchaseOrderNumber = _cookieService.Get(_PURCHASENUMBER);
-        filter.OrderGroupId = _cookieService.Get(_ORDERGROUPID);
-        filter.AddressId = _cookieService.Get(_SHIPPINGADDRESS);
-
-        return filter;
-    }
 }
