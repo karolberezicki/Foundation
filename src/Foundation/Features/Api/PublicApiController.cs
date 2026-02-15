@@ -14,7 +14,6 @@ public class PublicApiController : Controller
     private readonly IAddressBookService _addressBookService;
     private readonly LocalizationService _localizationService;
     private readonly ICustomerService _customerService;
-    //private readonly ICampaignService _campaignService;
     private readonly IUrlResolver _urlResolver;
     private readonly ICmsTrackingService _cmsTrackingService;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -23,7 +22,6 @@ public class PublicApiController : Controller
         IContentLoader contentLoader,
         IAddressBookService addressBookService,
         ICustomerService customerService,
-        //ICampaignService campaignService,
         IUrlResolver urlResolver,
         ICmsTrackingService cmsTrackingService,
         IHttpContextAccessor httpContextAccessor)
@@ -32,7 +30,6 @@ public class PublicApiController : Controller
         _contentLoader = contentLoader;
         _customerService = customerService;
         _addressBookService = addressBookService;
-        //_campaignService = campaignService;
         _urlResolver = urlResolver;
         _cmsTrackingService = cmsTrackingService;
         _httpContextAccessor = httpContextAccessor;
@@ -142,97 +139,6 @@ public class PublicApiController : Controller
         ModelState.AddModelError("LoginViewModel.Password", _localizationService.GetString("/Login/Form/Error/WrongPasswordOrEmail", "You have entered wrong username or password"));
         return View("~/Features/Login/Index.cshtml", Url.GetUserViewModel(returnUrl));
     }
-
-    //[HttpPost]
-    //[AllowAnonymous]
-    //[ValidateAntiForgeryToken]
-    //public ActionResult ExternalLogin(string provider, string returnUrl) =>
-    //    // Request a redirect to the external login provider
-    //    new ChallengeResult(provider, Url.Action("ExternalLoginCallback", new { returnUrl }));
-
-    //[AllowAnonymous]
-    //public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
-    //{
-    //    var loginInfo = await _customerService.GetExternalLoginInfoAsync();
-
-    //    if (loginInfo == null)
-    //    {
-    //        return Redirect("/");
-    //    }
-
-    //    // Sign in the user with this external login provider if the user already has a login
-    //    var result = await _customerService.SignInManager().ExternalSignInAsync(loginInfo, isPersistent: false);
-
-    //    switch (result)
-    //    {
-    //        case SignInStatus.Success:
-    //            return RedirectToLocal(returnUrl);
-
-    //        case SignInStatus.LockedOut:
-    //            return RedirectToAction("Lockout", "Login");
-
-    //        case SignInStatus.RequiresVerification:
-    //            return RedirectToAction("SendCode", "Login", new { ReturnUrl = returnUrl, RememberMe = false });
-    //        default:
-    //            // If the user does not have an account, then prompt the user to create an account
-    //            ViewBag.ReturnUrl = returnUrl;
-    //            ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-
-    //            return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { ReturnUrl = returnUrl });
-    //    }
-    //}
-
-    //[HttpPost]
-    //[AllowAnonymous]
-    //[ValidateAntiForgeryToken]
-    //public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel viewModel)
-    //{
-    //    if (User.Identity.IsAuthenticated)
-    //    {
-    //        return RedirectToAction("Index", "Manage");
-    //    }
-
-    //    if (ModelState.IsValid)
-    //    {
-    //        // Get the information about the user from the external login provider
-    //        var socialLoginDetails = await _customerService.GetExternalLoginInfoAsync();
-    //        if (socialLoginDetails == null)
-    //        {
-    //            return View("ExternalLoginFailure");
-    //        }
-
-    //        var eMail = socialLoginDetails.ExternalIdentity.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Email))?.Value;
-    //        var names = socialLoginDetails.ExternalIdentity.Name.Split(' ');
-    //        var firstName = names[0];
-    //        var lastName = names.Length > 1 ? names[1] : string.Empty;
-
-    //        var user = new SiteUser
-    //        {
-    //            UserName = eMail,
-    //            Email = eMail,
-    //            FirstName = firstName,
-    //            LastName = lastName,
-    //            RegistrationSource = "Social login",
-    //            NewsLetter = viewModel.Newsletter,
-    //            IsApproved = true
-    //        };
-
-    //        var result = await _customerService.CreateUser(user);
-    //        if (result.IdentityResult.Succeeded)
-    //        {
-    //            var identityResult = await _customerService.UserManager().AddLoginAsync(user.Id, socialLoginDetails.Login);
-    //            if (identityResult.Succeeded)
-    //            {
-    //                await _customerService.SignInManager().SignInAsync(user, isPersistent: false, rememberBrowser: false);
-    //                return RedirectToLocal(viewModel.ReturnUrl);
-    //            }
-    //        }
-
-    //        AddErrors(result.IdentityResult.Errors);
-    //    }
-
-    //    return View(viewModel);
-    //}
 
     [HttpPost]
     public ActionResult TrackHeroBlock(string blockId, string blockName, string pageName)
