@@ -15,7 +15,7 @@ public class LocationListPageController : PageController<LocationListPage>
         _contentLoader = contentLoader;
     }
 
-    public ActionResult Index(LocationListPage currentPage)
+    public async Task<ActionResult> Index(LocationListPage currentPage)
     {
         var query = SearchClient.Instance.Search<LocationItemPage.LocationItemPage>()
             .PublishedInCurrentLanguage()
@@ -43,9 +43,9 @@ public class LocationListPageController : PageController<LocationListPage>
             }
         }
 
-        var locations = query.OrderBy(x => x.PageName)
+        var locations = await query.OrderBy(x => x.PageName)
             .Take(500)
-            .StaticallyCacheFor(new System.TimeSpan(0, 1, 0)).GetContentResult();
+            .StaticallyCacheFor(new System.TimeSpan(0, 1, 0)).GetContentResultAsync();
 
         var model = new LocationListViewModel(currentPage)
         {

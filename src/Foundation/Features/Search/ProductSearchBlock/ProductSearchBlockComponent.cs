@@ -38,7 +38,7 @@ public class ProductSearchBlockComponent : AsyncBlockComponent<ProductSearchBloc
         ProductSearchResults result;
         try
         {
-            result = GetSearchResults(currentLang.Name, currentBlock);
+            result = await GetSearchResultsAsync(currentLang.Name, currentBlock);
         }
         catch (ServiceException)
         {
@@ -196,7 +196,7 @@ public class ProductSearchBlockComponent : AsyncBlockComponent<ProductSearchBloc
         return topSeller.OrderByDescending(x => x.Value).Select(x => x.Key.GetEntryContentBase().GetProductTileViewModel(market, currency));
     }
 
-    private ProductSearchResults GetSearchResults(string language, ProductSearchBlock productSearchBlock)
+    private async Task<ProductSearchResults> GetSearchResultsAsync(string language, ProductSearchBlock productSearchBlock)
     {
         var filterOptions = new FilterOptionViewModel
         {
@@ -208,7 +208,7 @@ public class ProductSearchBlockComponent : AsyncBlockComponent<ProductSearchBloc
         };
 
         var filters = GetFilters(productSearchBlock);
-        return _searchService.SearchWithFilters(null, filterOptions, filters);
+        return await _searchService.SearchWithFiltersAsync(null, filterOptions, filters);
     }
 
     private IEnumerable<EPiServer.Find.Api.Querying.Filter> GetFilters(ProductSearchBlock productSearchBlock)

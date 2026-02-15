@@ -125,7 +125,7 @@ public class FoundationSearchProvider : ContentSearchProviderBase<EntryContentBa
             .OrFilter(_ => _.Code.PrefixCaseInsensitive(keyword) | _.Name.PrefixCaseInsensitive(keyword))
             .OrFilter(_ => _.MatchTypeHierarchy(typeof(GenericProduct)) & (((GenericProduct)_).VariationContents().PrefixCaseInsensitive(x => x.Code, keyword)))
             .OrFilter(_ => _.MatchTypeHierarchy(typeof(GenericProduct)) & (((GenericProduct)_).VariationContents().PrefixCaseInsensitive(x => x.DisplayName, keyword)))
-            .GetContentResult(), keyword);
+            .GetContentResultAsync().GetAwaiter().GetResult(), keyword);
     }
 
     private IEnumerable<SearchResult> CreateSearchResults(IEnumerable<EntryContentBase> documents, string keyword)

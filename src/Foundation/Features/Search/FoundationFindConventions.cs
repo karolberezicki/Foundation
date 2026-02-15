@@ -63,6 +63,6 @@ public class FoundationFindConventions : CatalogContentClientConventions
         ContentIndexer.Instance.Conventions.ForInstancesOf<GenericVariant>().ShouldIndex(x => false);
         SearchClient.Instance.Conventions.ForInstancesOf<GenericProduct>().IncludeField(x => x.AvailableSizes());
         SearchClient.Instance.Conventions.ForInstancesOf<GenericProduct>().IncludeField(x => x.AvailableColors());
-        SearchClient.Instance.Conventions.NestedConventions.ForInstancesOf<GenericProduct>().Add(v => v.VariationModels());
+        SearchClient.Instance.Conventions.NestedConventions.ForInstancesOf<GenericProduct>().AddAsync(v => v.VariationModels()).GetAwaiter().GetResult();
     }
 }

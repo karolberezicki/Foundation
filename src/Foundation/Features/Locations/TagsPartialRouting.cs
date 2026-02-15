@@ -26,7 +26,7 @@ public class TagsPartialRouting : IPartialRouter<TagPage.TagPage, TagPage.TagPag
             //Check continent exists for this category
             var mcount = SearchClient.Instance.Search<LocationItemPage.LocationItemPage>()
                 .Filter(dp => dp.TagString().Match(content.Name)).Filter(dp => dp.Continent.MatchCaseInsensitive(continent))
-                .Take(0).GetContentResult().TotalMatching;
+                .Take(0).GetContentResultAsync().GetAwaiter().GetResult().TotalMatching;
 
             if (mcount == 0)
             {

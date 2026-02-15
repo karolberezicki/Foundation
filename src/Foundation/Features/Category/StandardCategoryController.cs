@@ -13,24 +13,24 @@ public class StandardCategoryController : ContentController<StandardCategory>
         _contentLoader = contentLoader;
     }
 
-    public ActionResult Index(StandardCategory currentContent, Pagination pagination)
+    public async Task<ActionResult> Index(StandardCategory currentContent, Pagination pagination)
     {
         var categories = new List<ContentReference> { currentContent.ContentLink };
         pagination.Categories = categories;
         var model = new CategorySearchViewModel(currentContent)
         {
-            SearchResults = _searchService.SearchByCategory(pagination)
+            SearchResults = await _searchService.SearchByCategoryAsync(pagination)
         };
         return View(model);
     }
 
-    public ActionResult GetListPages(StandardCategory currentContent, Pagination pagination)
+    public async Task<ActionResult> GetListPages(StandardCategory currentContent, Pagination pagination)
     {
         var categories = new List<ContentReference> { currentContent.ContentLink };
         pagination.Categories = categories;
         var model = new CategorySearchViewModel(currentContent)
         {
-            SearchResults = _searchService.SearchByCategory(pagination)
+            SearchResults = await _searchService.SearchByCategoryAsync(pagination)
         };
         return PartialView("_PageListing", model);
     }

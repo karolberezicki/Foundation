@@ -32,7 +32,7 @@ public class UsersIndexJob : ScheduledJobBase
 
         try
         {
-            IndexContacts();
+            IndexContacts().GetAwaiter().GetResult();
 
             return "Done";
         }
@@ -43,7 +43,7 @@ public class UsersIndexJob : ScheduledJobBase
         }
     }
 
-    private void IndexContacts()
+    private async Task IndexContacts()
     {
         var batchNumber = 0;
         List<FoundationContact> contacts;
@@ -59,8 +59,8 @@ public class UsersIndexJob : ScheduledJobBase
             {
                 if (contactsToIndex.Count > 0)
                 {
-                    Find.Service.Delete<UserSearchResultModel>(x => x.ContactId.Exists());
-                    Find.Service.Index(contactsToIndex);
+                    await Find.Service.DeleteAsync<UserSearchResultModel>(x => x.ContactId.Exists());
+                    await Find.Service.IndexAsync(contactsToIndex);
                 }
             }
             catch (Exception ex)

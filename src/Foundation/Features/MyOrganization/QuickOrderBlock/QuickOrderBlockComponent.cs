@@ -150,9 +150,9 @@ public class QuickOrderBlockComponent : AsyncBlockComponent<QuickOrderBlock>
         return new ContentViewComponentResult(stringResult);
     }
 
-    public IViewComponentResult GetSku(string query)
+    public async Task<IViewComponentResult> GetSku(string query)
     {
-        var data = _quickOrderService.SearchSkus(query);
+        var data = await _quickOrderService.SearchSkusAsync(query);
         return new ContentViewComponentResult(JsonConvert.SerializeObject(data));
     }
 

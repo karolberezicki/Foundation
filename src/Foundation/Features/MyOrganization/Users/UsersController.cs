@@ -184,9 +184,9 @@ public class UsersController : PageController<UsersPage>
     }
 
     [NavigationAuthorize("Admin")]
-    public JsonResult GetUsers(string query)
+    public async Task<JsonResult> GetUsers(string query)
     {
-        var data = _searchService.SearchUsers(query);
+        var data = await _searchService.SearchUsersAsync(query);
         return Json(data);
     }
 

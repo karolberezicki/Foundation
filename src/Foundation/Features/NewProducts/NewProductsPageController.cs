@@ -15,14 +15,15 @@ public class NewProductsPageController : PageController<NewProductsPage>
         _settingsService = settingsService;
     }
 
-    public ActionResult Index(NewProductsPage currentPage, int page = 1)
+    public async Task<ActionResult> Index(NewProductsPage currentPage, int page = 1)
     {
         var searchsettings = _settingsService.GetSiteSettings<SearchSettings>();
+        var result = await _searchService.SearchNewProductsAsync(currentPage, searchsettings?.SearchCatalog ?? 0, page);
         var model = new NewProductsPageViewModel(currentPage)
         {
-            ProductViewModels = _searchService.SearchNewProducts(currentPage, out var pages, searchsettings?.SearchCatalog ?? 0, page),
+            ProductViewModels = result.Products,
             PageNumber = page,
-            Pages = pages
+            Pages = result.Pages
         };
 
         return View(model);

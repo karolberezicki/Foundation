@@ -23,11 +23,11 @@ public class LocationsPartialRouting : IPartialRouter<LocationItemPage.LocationI
         urlResolverContext.RemainingPath = string.Empty;
 
         TagPage.TagPage cp = null;
-        var catpages = SearchClient.Instance.Search<TagPage.TagPage>().Take(100).GetContentResult().ToList();
+        var catpages = SearchClient.Instance.Search<TagPage.TagPage>().Take(100).GetContentResultAsync().GetAwaiter().GetResult().ToList();
         var continents = SearchClient.Instance.Search<LocationItemPage.LocationItemPage>()
             .TermsFacetFor(f => f.Continent)
             .Take(0)
-            .GetContentResult()
+            .GetContentResultAsync().GetAwaiter().GetResult()
             .TermsFacetFor(f => f.Continent)
             .Terms.Select(tc => tc.Term.ToLower())
             .ToList();

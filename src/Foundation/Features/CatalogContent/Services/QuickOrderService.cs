@@ -14,7 +14,7 @@ public interface IQuickOrderService
     string ValidateProduct(ContentReference variationReference, decimal quantity, string code);
     QuickOrderProductViewModel GetProductByCode(ContentReference productReference);
     decimal GetTotalInventoryByEntry(string code);
-    IEnumerable<SkuSearchResultModel> SearchSkus(string query);
+    Task<IEnumerable<SkuSearchResultModel>> SearchSkusAsync(string query);
 }
 
 public class QuickOrderService : IQuickOrderService
@@ -81,19 +81,21 @@ public class QuickOrderService : IQuickOrderService
     }
 
     public decimal GetTotalInventoryByEntry(string code) => _inventoryService.QueryByEntry(new[] { code }).Sum(x => x.PurchaseAvailableQuantity);
-    public IEnumerable<SkuSearchResultModel> SearchSkus(string query)
+    public async Task<IEnumerable<SkuSearchResultModel>> SearchSkusAsync(string query)
     {
         var market = _currentMarket.GetCurrentMarket();
         var currency = _currencyService.GetCurrentCurrency();
 
-        var results = _findClient.Search<ProductContent>()
+        var searchResults = await _findClient.Search<ProductContent>()
             .Filter(_ => _.VariationModels(), x => x.Code.PrefixCaseInsensitive(query))
             .FilterMarket(market)
             .Filter(x => x.Language.Name.Match(_languageResolver.Language.Name))
             .Track()
             .FilterForVisitor()
             .Select(_ => _.VariationModels())
-            .GetResult()
+            .GetResultAsync();
+
+        var results = searchResults
             .SelectMany(x => x)
             .ToList();
 

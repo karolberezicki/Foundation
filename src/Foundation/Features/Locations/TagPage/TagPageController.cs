@@ -14,7 +14,7 @@ public class TagPageController : PageController<TagPage>
         _contentLoader = contentLoader;
     }
 
-    public ActionResult Index(TagPage currentPage)
+    public async Task<ActionResult> Index(TagPage currentPage)
     {
         var model = new TagsViewModel(currentPage)
         {
@@ -37,7 +37,7 @@ public class TagPageController : PageController<TagPage>
         {
             query = query.Filter(dp => dp.Continent.MatchCaseInsensitive(model.Continent));
         }
-        model.Locations = query.StaticallyCacheFor(new System.TimeSpan(0, 1, 0)).GetContentResult().ToList();
+        model.Locations = (await query.StaticallyCacheFor(new System.TimeSpan(0, 1, 0)).GetContentResultAsync()).ToList();
 
         //Add theme images from results
         var carousel = new TagsCarouselViewModel

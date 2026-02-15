@@ -17,7 +17,7 @@ public class PersonListPageController : PageController<PersonList>
         _settingsService = settingsService;
     }
 
-    public ActionResult Index(PersonList currentPage)
+    public async Task<ActionResult> Index(PersonList currentPage)
     {
         var queryString = Request.Query;
         var query = SearchClient.Instance.Search<PersonPage>();
@@ -37,9 +37,9 @@ public class PersonListPageController : PageController<PersonList>
             query = query.Filter(x => x.Location.Match(queryString["location"].ToString()));
         }
 
-        var persons = query.OrderBy(x => x.PageName)
+        var persons = await query.OrderBy(x => x.PageName)
             .Take(500)
-            .GetContentResult();
+            .GetContentResultAsync();
 
         var settingPage = _settingsService.GetSiteSettings<CollectionSettings>();
 

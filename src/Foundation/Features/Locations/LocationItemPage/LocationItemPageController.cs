@@ -13,7 +13,7 @@ public class LocationItemPageController : PageController<LocationItemPage>
         _contentRepository = contentRepository;
     }
 
-    public ActionResult Index(LocationItemPage currentPage)
+    public async Task<ActionResult> Index(LocationItemPage currentPage)
     {
         var model = new LocationItemViewModel(currentPage);
         if (!ContentReference.IsNullOrEmpty(currentPage.Image))
@@ -21,7 +21,7 @@ public class LocationItemPageController : PageController<LocationItemPage>
             model.Image = _contentRepository.Get<ImageData>(currentPage.Image);
         }
 
-        model.LocationNavigation.ContinentLocations = SearchClient.Instance
+        model.LocationNavigation.ContinentLocations = await SearchClient.Instance
             .Search<LocationItemPage>()
             .Filter(x => x.Continent.Match(currentPage.Continent))
             .PublishedInCurrentLanguage()
@@ -29,9 +29,9 @@ public class LocationItemPageController : PageController<LocationItemPage>
             .FilterForVisitor()
             .Take(100)
             .StaticallyCacheFor(new System.TimeSpan(0, 10, 0))
-            .GetContentResult();
+            .GetContentResultAsync();
 
-        model.LocationNavigation.CloseBy = SearchClient.Instance
+        model.LocationNavigation.CloseBy = await SearchClient.Instance
             .Search<LocationItemPage>()
             .Filter(x => x.Continent.Match(currentPage.Continent)
                          & !x.PageLink.Match(currentPage.PageLink))
@@ -41,7 +41,7 @@ public class LocationItemPageController : PageController<LocationItemPage>
             .DistanceFrom(currentPage.Coordinates)
             .Take(5)
             .StaticallyCacheFor(new System.TimeSpan(0, 10, 0))
-            .GetContentResult();
+            .GetContentResultAsync();
 
         //if (currentPage.Categories != null)
         //{
@@ -55,7 +55,7 @@ public class LocationItemPageController : PageController<LocationItemPage>
         return View(model);
     }
 
-    private IEnumerable<LocationItemPage> GetRelatedLocations(LocationItemPage currentPage)
+    private async Task<IEnumerable<LocationItemPage>> GetRelatedLocationsAsync(LocationItemPage currentPage)
     {
         IQueriedSearch<LocationItemPage> query = SearchClient.Instance
             .Search<LocationItemPage>()
@@ -73,12 +73,12 @@ public class LocationItemPageController : PageController<LocationItemPage>
             (current, category) =>
                 current.BoostMatching(x => x.InCategory(category), 1.5));
 
-        return query
+        return await query
             .Filter(x => !x.PageLink.Match(currentPage.PageLink))
             .PublishedInCurrentLanguage()
             .FilterForVisitor()
             .Take(3)
-            .GetPagesResult();
+            .GetPagesResultAsync();
     }
 
     public virtual string SearchTextFly(LocationItemPage currentPage)

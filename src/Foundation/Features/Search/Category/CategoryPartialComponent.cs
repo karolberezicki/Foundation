@@ -17,13 +17,13 @@ public class CategoryPartialComponent : AsyncPartialContentComponent<GenericNode
     [AcceptVerbs(new string[] { "GET", "POST" })]
     protected override async Task<IViewComponentResult> InvokeComponentAsync(GenericNode currentContent)
     {
-        var viewmodel = GetSearchModel(currentContent);
-        return await Task.FromResult(View("_Category", viewmodel));
+        var viewmodel = await GetSearchModelAsync(currentContent);
+        return View("_Category", viewmodel);
     }
 
-    protected virtual SearchViewModel<GenericNode> GetSearchModel(GenericNode currentContent)
+    protected virtual async Task<SearchViewModel<GenericNode>> GetSearchModelAsync(GenericNode currentContent)
     {
-        return _viewModelFactory.Create(currentContent, _httpContextAccessor.HttpContext.Request.Query["facets"].ToString(), 0, new FilterOptionViewModel
+        return await _viewModelFactory.CreateAsync(currentContent, _httpContextAccessor.HttpContext.Request.Query["facets"].ToString(), 0, new FilterOptionViewModel
         {
             FacetGroups = new List<FacetGroupOption>(),
             Page = 1,

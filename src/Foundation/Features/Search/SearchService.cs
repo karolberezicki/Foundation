@@ -33,19 +33,19 @@ namespace Foundation.Features.Search;
 
 public interface ISearchService
 {
-    ProductSearchResults Search(IContent currentContent, FilterOptionViewModel filterOptions, string selectedFacets, int catalogId = 0);
-    ProductSearchResults SearchWithFilters(IContent currentContent, FilterOptionViewModel filterOptions, IEnumerable<Filter> filters, int catalogId = 0);
-    IEnumerable<ProductTileViewModel> SearchOnSale(SalesPage currentContent, out List<int> pages, int catalogId = 0, int page = 1, int pageSize = 12);
-    IEnumerable<ProductTileViewModel> SearchNewProducts(NewProductsPage currentContent, out List<int> pages, int catalogId = 0, int page = 1, int pageSize = 12);
-    IEnumerable<ProductTileViewModel> QuickSearch(string query, int catalogId = 0);
-    IEnumerable<ProductTileViewModel> QuickSearch(FilterOptionViewModel filterOptions, int catalogId = 0);
+    Task<ProductSearchResults> SearchAsync(IContent currentContent, FilterOptionViewModel filterOptions, string selectedFacets, int catalogId = 0);
+    Task<ProductSearchResults> SearchWithFiltersAsync(IContent currentContent, FilterOptionViewModel filterOptions, IEnumerable<Filter> filters, int catalogId = 0);
+    Task<(IEnumerable<ProductTileViewModel> Products, List<int> Pages)> SearchOnSaleAsync(SalesPage currentContent, int catalogId = 0, int page = 1, int pageSize = 12);
+    Task<(IEnumerable<ProductTileViewModel> Products, List<int> Pages)> SearchNewProductsAsync(NewProductsPage currentContent, int catalogId = 0, int page = 1, int pageSize = 12);
+    Task<IEnumerable<ProductTileViewModel>> QuickSearchAsync(string query, int catalogId = 0);
+    Task<IEnumerable<ProductTileViewModel>> QuickSearchAsync(FilterOptionViewModel filterOptions, int catalogId = 0);
     IEnumerable<SortOrder> GetSortOrder();
     string GetOutline(string nodeCode);
-    IEnumerable<UserSearchResultModel> SearchUsers(string query, int page = 1, int pageSize = 50);
-    IEnumerable<SkuSearchResultModel> SearchSkus(string query);
-    ContentSearchViewModel SearchContent(FilterOptionViewModel filterOptions);
-    ContentSearchViewModel SearchPdf(FilterOptionViewModel filterOptions);
-    CategorySearchResults SearchByCategory(Pagination pagination);
+    Task<IEnumerable<UserSearchResultModel>> SearchUsersAsync(string query, int page = 1, int pageSize = 50);
+    Task<IEnumerable<SkuSearchResultModel>> SearchSkusAsync(string query);
+    Task<ContentSearchViewModel> SearchContentAsync(FilterOptionViewModel filterOptions);
+    Task<ContentSearchViewModel> SearchPdfAsync(FilterOptionViewModel filterOptions);
+    Task<CategorySearchResults> SearchByCategoryAsync(Pagination pagination);
     ITypeSearch<T> FilterByCategories<T>(ITypeSearch<T> query, IEnumerable<ContentReference> categories) where T : ICategorizableContent;
 }
 
@@ -94,21 +94,21 @@ public class SearchService : ISearchService
         _bestBetRepository = bestBetRepository;
     }
 
-    public ProductSearchResults Search(IContent currentContent,
+    public async Task<ProductSearchResults> SearchAsync(IContent currentContent,
         FilterOptionViewModel filterOptions,
         string selectedFacets,
-        int catalogId = 0) => filterOptions == null ? CreateEmptyResult() : GetSearchResults(currentContent, filterOptions, selectedFacets, null, catalogId);
+        int catalogId = 0) => filterOptions == null ? CreateEmptyResult() : await GetSearchResultsAsync(currentContent, filterOptions, selectedFacets, null, catalogId);
 
-    public ProductSearchResults SearchWithFilters(IContent currentContent,
+    public async Task<ProductSearchResults> SearchWithFiltersAsync(IContent currentContent,
         FilterOptionViewModel filterOptions,
         IEnumerable<Filter> filters,
-        int catalogId = 0) => filterOptions == null ? CreateEmptyResult() : GetSearchResults(currentContent, filterOptions, "", filters, catalogId);
+        int catalogId = 0) => filterOptions == null ? CreateEmptyResult() : await GetSearchResultsAsync(currentContent, filterOptions, "", filters, catalogId);
 
-    public IEnumerable<ProductTileViewModel> QuickSearch(FilterOptionViewModel filterOptions,
+    public async Task<IEnumerable<ProductTileViewModel>> QuickSearchAsync(FilterOptionViewModel filterOptions,
         int catalogId = 0)
-        => string.IsNullOrEmpty(filterOptions.Q) ? Enumerable.Empty<ProductTileViewModel>() : GetSearchResults(null, filterOptions, "", null, catalogId).ProductViewModels;
+        => string.IsNullOrEmpty(filterOptions.Q) ? Enumerable.Empty<ProductTileViewModel>() : (await GetSearchResultsAsync(null, filterOptions, "", null, catalogId)).ProductViewModels;
 
-    public IEnumerable<ProductTileViewModel> QuickSearch(string query, int catalogId = 0)
+    public async Task<IEnumerable<ProductTileViewModel>> QuickSearchAsync(string query, int catalogId = 0)
     {
         var filterOptions = new FilterOptionViewModel
         {
@@ -119,7 +119,7 @@ public class SearchService : ISearchService
             Page = 1,
             TrackData = false
         };
-        return QuickSearch(filterOptions, catalogId);
+        return await QuickSearchAsync(filterOptions, catalogId);
     }
 
     public IEnumerable<SortOrder> GetSortOrder()
@@ -134,14 +134,14 @@ public class SearchService : ISearchService
         };
     }
 
-    public IEnumerable<UserSearchResultModel> SearchUsers(string query, int page = 1, int pageSize = 50)
+    public async Task<IEnumerable<UserSearchResultModel>> SearchUsersAsync(string query, int page = 1, int pageSize = 50)
     {
         var searchQuery = _findClient.Search<UserSearchResultModel>();
         if (!string.IsNullOrEmpty(query))
         {
             searchQuery = searchQuery.For(query);
         }
-        var results = searchQuery.Skip((page - 1) * pageSize).Take(pageSize).GetResult();
+        var results = await searchQuery.Skip((page - 1) * pageSize).Take(pageSize).GetResultAsync();
         if (results != null && results.Any())
         {
             return results.Hits.AsEnumerable().Select(x => x.Document);
@@ -150,19 +150,21 @@ public class SearchService : ISearchService
         return Enumerable.Empty<UserSearchResultModel>();
     }
 
-    public IEnumerable<SkuSearchResultModel> SearchSkus(string query)
+    public async Task<IEnumerable<SkuSearchResultModel>> SearchSkusAsync(string query)
     {
         var market = _currentMarket.GetCurrentMarket();
         var currency = _currencyservice.GetCurrentCurrency();
 
-        var results = _findClient.Search<GenericProduct>()
+        var searchResults = await _findClient.Search<GenericProduct>()
             .Filter(_ => _.VariationModels(), x => x.Code.PrefixCaseInsensitive(query))
             .FilterMarket(market)
             .Filter(x => x.Language.Name.Match(_contentLanguageAccessor.Language.Name))
             .Track()
             .FilterForVisitor()
             .Select(_ => _.VariationModels())
-            .GetResult()
+            .GetResultAsync();
+
+        var results = searchResults
             .SelectMany(x => x)
             .ToList();
 
@@ -186,34 +188,34 @@ public class SearchService : ISearchService
         return Enumerable.Empty<SkuSearchResultModel>();
     }
 
-    public IEnumerable<ProductTileViewModel> SearchOnSale(SalesPage currentContent, out List<int> pages, int catalogId = 0, int page = 1, int pageSize = 12)
+    public async Task<(IEnumerable<ProductTileViewModel> Products, List<int> Pages)> SearchOnSaleAsync(SalesPage currentContent, int catalogId = 0, int page = 1, int pageSize = 12)
     {
         var market = _currentMarket.GetCurrentMarket();
         var currency = _currencyService.GetCurrentCurrency();
         var query = BaseInlcusionExclusionQuery(currentContent, catalogId);
         query = query.Filter(x => (x as GenericProduct).OnSale.Match(true));
-        var result = query.GetContentResult();
+        var result = await query.GetContentResultAsync();
         var searchProducts = CreateProductViewModels(result, currentContent, "").ToList();
-        GetManaualInclusion(searchProducts, currentContent, market, currency);
-        pages = GetPages(currentContent, page, searchProducts.Count);
-        return searchProducts;
+        await GetManaualInclusionAsync(searchProducts, currentContent, market, currency);
+        var pages = GetPages(currentContent, page, searchProducts.Count);
+        return (searchProducts, pages);
     }
 
-    public IEnumerable<ProductTileViewModel> SearchNewProducts(NewProductsPage currentContent, out List<int> pages, int catalogId = 0, int page = 1, int pageSize = 12)
+    public async Task<(IEnumerable<ProductTileViewModel> Products, List<int> Pages)> SearchNewProductsAsync(NewProductsPage currentContent, int catalogId = 0, int page = 1, int pageSize = 12)
     {
         var market = _currentMarket.GetCurrentMarket();
         var currency = _currencyService.GetCurrentCurrency();
         var query = BaseInlcusionExclusionQuery(currentContent, page, pageSize, catalogId);
         query = query.OrderByDescending(x => x.Created);
         query = query.Take(currentContent.NumberOfProducts == 0 ? 12 : currentContent.NumberOfProducts);
-        var result = query.GetContentResult();
+        var result = await query.GetContentResultAsync();
         var searchProducts = CreateProductViewModels(result, currentContent, "").ToList();
-        GetManaualInclusion(searchProducts, currentContent, market, currency);
-        pages = GetPages(currentContent, page, searchProducts.Count);
-        return searchProducts;
+        await GetManaualInclusionAsync(searchProducts, currentContent, market, currency);
+        var pages = GetPages(currentContent, page, searchProducts.Count);
+        return (searchProducts, pages);
     }
 
-    public ContentSearchViewModel SearchContent(FilterOptionViewModel filterOptions)
+    public async Task<ContentSearchViewModel> SearchContentAsync(FilterOptionViewModel filterOptions)
     {
         var model = new ContentSearchViewModel
         {
@@ -259,14 +261,14 @@ public class SearchService : ISearchService
                 HighlightExcerpt = true
             };
 
-            model.Hits = query.GetResult(hitSpec);
+            model.Hits = await query.GetResultAsync(hitSpec);
             filterOptions.TotalCount = model.Hits.TotalMatching;
         }
 
         return model;
     }
 
-    public ContentSearchViewModel SearchPdf(FilterOptionViewModel filterOptions)
+    public async Task<ContentSearchViewModel> SearchPdfAsync(FilterOptionViewModel filterOptions)
     {
         var model = new ContentSearchViewModel
         {
@@ -280,7 +282,7 @@ public class SearchService : ISearchService
                 .UsingSynonyms()
                 .TermsFacetFor(x => x.SearchSection)
                 .FilterFacet("AllSections", x => x.SearchSection.Exists())
-                .Filter(x => x.MatchTypeHierarchy(typeof(FoundationPdfFile)) | x.MatchTypeHierarchy(typeof(EPiServer.PdfPreview.Models.PdfFile)))              
+                .Filter(x => x.MatchTypeHierarchy(typeof(FoundationPdfFile)) | x.MatchTypeHierarchy(typeof(EPiServer.PdfPreview.Models.PdfFile)))
                 .Skip((filterOptions.Page - 1) * filterOptions.PageSize)
                 .Take(filterOptions.PageSize)
                 .ApplyBestBets();
@@ -303,14 +305,14 @@ public class SearchService : ISearchService
                 HighlightExcerpt = true
             };
 
-            model.Hits = query.GetResult(hitSpec);
+            model.Hits = await query.GetResultAsync(hitSpec);
             filterOptions.TotalCount = model.Hits.TotalMatching;
         }
 
         return model;
     }
 
-    public CategorySearchResults SearchByCategory(Pagination pagination)
+    public async Task<CategorySearchResults> SearchByCategoryAsync(Pagination pagination)
     {
         if (pagination == null)
         {
@@ -345,7 +347,7 @@ public class SearchService : ISearchService
         }
 
         query = query.Skip((pagination.Page - 1) * pagination.PageSize).Take(pagination.PageSize);
-        var results = query.GetContentResult();
+        var results = await query.GetContentResultAsync();
         var model = new CategorySearchResults
         {
             Pagination = pagination,
@@ -392,7 +394,7 @@ public class SearchService : ISearchService
         return list;
     }
 
-    private void GetManaualInclusion(List<ProductTileViewModel> results,
+    private async Task GetManaualInclusionAsync(List<ProductTileViewModel> results,
         BaseInclusionExclusionPage baseInclusionExclusionPage,
         IMarket market,
         Currency currency)
@@ -403,7 +405,7 @@ public class SearchService : ISearchService
             return;
         }
 
-        var inclusions = GetManualInclusion(baseInclusionExclusionPage.ManualInclusion).Select(x => x.GetProductTileViewModel(market, currency));
+        var inclusions = (await GetManualInclusionAsync(baseInclusionExclusionPage.ManualInclusion)).Select(x => x.GetProductTileViewModel(market, currency));
         if (baseInclusionExclusionPage.ManualInclusionOrdering == InclusionOrdering.Beginning)
         {
             results.InsertRange(0, inclusions);
@@ -477,22 +479,22 @@ public class SearchService : ISearchService
         return query;
     }
 
-    private IEnumerable<EntryContentBase> GetManualInclusion(IList<ContentReference> manualInclusion)
+    private async Task<IEnumerable<EntryContentBase>> GetManualInclusionAsync(IList<ContentReference> manualInclusion)
     {
         var results = new List<EntryContentBase>();
         foreach (var item in _contentLoader.GetItems(manualInclusion, _contentLanguageAccessor.Language))
         {
             if (item.GetOriginalType().Equals(typeof(EPiServer.Commerce.Catalog.ContentTypes.CatalogContent)))
             {
-                results.AddRange(_findClient.Search<EntryContentBase>()
+                results.AddRange(await _findClient.Search<EntryContentBase>()
                     .Filter(_ => _.CatalogId.Match(((EPiServer.Commerce.Catalog.ContentTypes.CatalogContent)item).CatalogId))
-                    .GetContentResult());
+                    .GetContentResultAsync());
             }
             else if (item.GetOriginalType().Equals(typeof(GenericNode)))
             {
-                results.AddRange(_findClient.Search<EntryContentBase>()
+                results.AddRange(await _findClient.Search<EntryContentBase>()
                     .Filter(_ => _.Ancestors().Match(((GenericNode)item).ContentLink.ToString()))
-                    .GetContentResult());
+                    .GetContentResultAsync());
             }
             else if (item.GetOriginalType().Equals(typeof(GenericProduct))
                      || item.GetOriginalType().Equals(typeof(GenericPackage)))
@@ -503,7 +505,7 @@ public class SearchService : ISearchService
         return ListExtensions.DistinctBy(results, (e) => e.ContentGuid);
     }
 
-    private ProductSearchResults GetSearchResults(IContent currentContent,
+    private async Task<ProductSearchResults> GetSearchResultsAsync(IContent currentContent,
         FilterOptionViewModel filterOptions,
         string selectedfacets,
         IEnumerable<Filter> filters = null,
@@ -573,14 +575,14 @@ public class SearchService : ISearchService
             .Take(pageSize)
             .StaticallyCacheFor(TimeSpan.FromMinutes(1));
 
-        var result = query.GetContentResult();
+        var result = await query.GetContentResultAsync();
 
         return new ProductSearchResults
         {
             ProductViewModels = CreateProductViewModels(result, currentContent, filterOptions.Q),
-            FacetGroups = GetFacetResults(filterOptions.FacetGroups, facetQuery, selectedfacets),
+            FacetGroups = await GetFacetResultsAsync(filterOptions.FacetGroups, facetQuery, selectedfacets),
             TotalCount = result.TotalMatching,
-            DidYouMeans = string.IsNullOrEmpty(filterOptions.Q) ? null : result.TotalMatching != 0 ? null : _findClient.Statistics().GetDidYouMean(filterOptions.Q),
+            DidYouMeans = string.IsNullOrEmpty(filterOptions.Q) ? null : result.TotalMatching != 0 ? null : await _findClient.Statistics().GetDidYouMeanAsync(filterOptions.Q),
             Query = filterOptions.Q,
         };
     }
@@ -697,7 +699,7 @@ public class SearchService : ISearchService
         return query;
     }
 
-    private IEnumerable<FacetGroupOption> GetFacetResults(List<FacetGroupOption> options,
+    private async Task<IEnumerable<FacetGroupOption>> GetFacetResultsAsync(List<FacetGroupOption> options,
         ITypeSearch<EntryContentBase> query,
         string selectedfacets)
     {
@@ -715,7 +717,7 @@ public class SearchService : ISearchService
 
         query = facets.Aggregate(query, (current, facet) => facet.Facet(current, GetSelectedFilter(options, facet.FieldName)));
 
-        var productFacetsResult = query.Take(0).GetContentResult();
+        var productFacetsResult = await query.Take(0).GetContentResultAsync();
         if (productFacetsResult.Facets == null)
         {
             return facetGroups;

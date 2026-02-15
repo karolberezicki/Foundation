@@ -32,7 +32,7 @@ public class CategoryController : CatalogContentControllerBase<GenericNode>
             viewModel.ViewSwitcher = string.IsNullOrEmpty(currentContent.DefaultTemplate) ? "Grid" : currentContent.DefaultTemplate;
         }
 
-        var model = _viewModelFactory.Create(currentContent,
+        var model = await _viewModelFactory.CreateAsync(currentContent,
             _httpContextAccessor.HttpContext.Request.Query["facets"].ToString(),
             0,
             viewModel);

@@ -13,7 +13,7 @@ namespace Foundation.Features.Search;
 
 public interface ISearchViewModelFactory
 {
-    SearchViewModel<TContent> Create<TContent>(TContent currentContent, string selectedFacets,
+    Task<SearchViewModel<TContent>> CreateAsync<TContent>(TContent currentContent, string selectedFacets,
         int catlogId, FilterOptionViewModel filterOption)
         where TContent : IContent;
 }
@@ -47,7 +47,7 @@ public class SearchViewModelFactory : ISearchViewModelFactory
         _synchronizedObjectInstanceCache = synchronizedObjectInstanceCache;
     }
 
-    public virtual SearchViewModel<TContent> Create<TContent>(TContent currentContent,
+    public virtual async Task<SearchViewModel<TContent>> CreateAsync<TContent>(TContent currentContent,
         string selectedFacets,
         int catalogId,
         FilterOptionViewModel filterOption)
@@ -65,7 +65,7 @@ public class SearchViewModelFactory : ISearchViewModelFactory
             return model;
         }
 
-        var results = _searchService.Search(currentContent, filterOption, selectedFacets, catalogId);
+        var results = await _searchService.SearchAsync(currentContent, filterOption, selectedFacets, catalogId);
 
         filterOption.TotalCount = results.TotalCount;
         filterOption.FacetGroups = results.FacetGroups.ToList();
@@ -80,7 +80,7 @@ public class SearchViewModelFactory : ISearchViewModelFactory
         model.CurrentContent = currentContent;
         model.ProductViewModels = results?.ProductViewModels ?? new List<ProductTileViewModel>();
         model.FilterOption = filterOption;
-        model.CategoriesFilter = GetCategoriesFilter(currentContent, filterOption.Q);
+        model.CategoriesFilter = await GetCategoriesFilterAsync(currentContent, filterOption.Q);
         model.DidYouMeans = results.DidYouMeans;
         model.Query = filterOption.Q;
         var detection = _httpContextAccessor.HttpContext.RequestServices.GetRequiredService<IDetectionService>();
@@ -89,7 +89,7 @@ public class SearchViewModelFactory : ISearchViewModelFactory
         return model;
     }
 
-    private CategoriesFilterViewModel GetCategoriesFilter(IContent currentContent, string query)
+    private async Task<CategoriesFilterViewModel> GetCategoriesFilterAsync(IContent currentContent, string query)
     {
         var bestBets = new BestBetRepository(_synchronizedObjectInstanceCache).List().Where(i => i.PhraseCriterion.Phrase.CompareTo(query) == 0);
         //var ownStyleBestBets = bestBets.Where(i => i.BestBetSelector is CommerceBestBetSelector && i.HasOwnStyle);
@@ -108,10 +108,10 @@ public class SearchViewModelFactory : ISearchViewModelFactory
         }
 
         var viewModel = new CategoriesFilterViewModel();
-        var nodes = _findClient.Search<NodeContent>()
+        var nodes = await _findClient.Search<NodeContent>()
             .Filter(x => x.ParentLink.ID.Match(catalog.ContentLink.ID))
             .FilterForVisitor()
-            .GetContentResult();
+            .GetContentResultAsync();
 
         foreach (var nodeContent in nodes)
         {
@@ -124,17 +124,17 @@ public class SearchViewModelFactory : ISearchViewModelFactory
             };
             viewModel.Categories.Add(nodeFilter);
 
-            GetChildrenNode(currentContent, nodeContent, nodeFilter, null);
+            await GetChildrenNodeAsync(currentContent, nodeContent, nodeFilter, null);
         }
         return viewModel;
     }
 
-    private void GetChildrenNode(IContent currentContent, NodeContent node, CategoryFilter nodeFilter, IEnumerable<BestBetBase> ownStyleBestBets)
+    private async Task GetChildrenNodeAsync(IContent currentContent, NodeContent node, CategoryFilter nodeFilter, IEnumerable<BestBetBase> ownStyleBestBets)
     {
-        var nodeChildrenOfNode = _findClient.Search<NodeContent>()
+        var nodeChildrenOfNode = await _findClient.Search<NodeContent>()
             .Filter(x => x.ParentLink.ID.Match(node.ContentLink.ID))
             .FilterForVisitor()
-            .GetContentResult();
+            .GetContentResultAsync();
         foreach (var nodeChildOfChild in nodeChildrenOfNode)
         {
             var nodeChildOfChildFilter = new CategoryFilter
@@ -151,7 +151,7 @@ public class SearchViewModelFactory : ISearchViewModelFactory
                 nodeFilter.IsActive = nodeFilter.IsActive = true;
             }
 
-            GetChildrenNode(currentContent, nodeChildOfChild, nodeChildOfChildFilter, ownStyleBestBets);
+            await GetChildrenNodeAsync(currentContent, nodeChildOfChild, nodeChildOfChildFilter, ownStyleBestBets);
         }
     }
 }

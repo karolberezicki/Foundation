@@ -59,7 +59,7 @@ public class SearchController : PageController<SearchResultPage>
 
         var searchSettings = _settingsService.GetSiteSettings<SearchSettings>();
         var startPage = _contentLoader.Get<HomePage>(ContentReference.StartPage);
-        var viewModel = _viewModelFactory.Create(currentPage,
+        var viewModel = await _viewModelFactory.CreateAsync(currentPage,
             _httpContextAccessor.HttpContext.Request.Query["facets"].ToString(),
             searchSettings?.SearchCatalog ?? 0,
             filterOptions);
@@ -91,7 +91,7 @@ public class SearchController : PageController<SearchResultPage>
         await _cmsTrackingService.SearchedKeyword(_httpContextAccessor.HttpContext, filterOptions.Q);
         if (searchSettings?.ShowContentSearchResults ?? true)
         {
-            viewModel.ContentSearchResult = _searchService.SearchContent(new FilterOptionViewModel()
+            viewModel.ContentSearchResult = await _searchService.SearchContentAsync(new FilterOptionViewModel()
             {
                 Q = filterOptions.Q,
                 PageSize = 5,
@@ -103,7 +103,7 @@ public class SearchController : PageController<SearchResultPage>
 
         if (searchSettings?.ShowPdfSearchResults ?? true)
         {
-            viewModel.PdfSearchResult = _searchService.SearchPdf(new FilterOptionViewModel()
+            viewModel.PdfSearchResult = await _searchService.SearchPdfAsync(new FilterOptionViewModel()
             {
                 Q = filterOptions.Q,
                 PageSize = 5,
@@ -144,7 +144,7 @@ public class SearchController : PageController<SearchResultPage>
     }
 
     [HttpPost]
-    public ActionResult QuickSearch([FromBody] QuickSearchTerm quicksearchterm)
+    public async Task<ActionResult> QuickSearch([FromBody] QuickSearchTerm quicksearchterm)
     {
         var redirectUrl = "";
         var startPage = _contentLoader.Get<HomePage>(ContentReference.StartPage);
@@ -156,7 +156,7 @@ public class SearchController : PageController<SearchResultPage>
         var searchSettings = _settingsService.GetSiteSettings<SearchSettings>();
         if (searchSettings?.ShowProductSearchResults ?? true)
         {
-            var productResults = _searchService.QuickSearch(quicksearchterm.search, searchSettings?.SearchCatalog ?? 0);
+            var productResults = await _searchService.QuickSearchAsync(quicksearchterm.search, searchSettings?.SearchCatalog ?? 0);
             model.ProductViewModels = productResults;
             productCount = productResults?.Count() ?? 0;
 
@@ -176,7 +176,7 @@ public class SearchController : PageController<SearchResultPage>
 
         if (searchSettings?.ShowContentSearchResults ?? true)
         {
-            var contentResult = _searchService.SearchContent(new FilterOptionViewModel()
+            var contentResult = await _searchService.SearchContentAsync(new FilterOptionViewModel()
             {
                 Q = quicksearchterm.search,
                 PageSize = 5,
@@ -189,7 +189,7 @@ public class SearchController : PageController<SearchResultPage>
 
         if (searchSettings?.ShowPdfSearchResults ?? true)
         {
-            var pdfResult = _searchService.SearchPdf(new FilterOptionViewModel()
+            var pdfResult = await _searchService.SearchPdfAsync(new FilterOptionViewModel()
             {
                 Q = quicksearchterm.search,
                 PageSize = 5,
