@@ -22,8 +22,7 @@ export default class MyProfile {
         let inst = this;
         Array.from(document.getElementsByClassName("jsEditProfile")).forEach(function (el, i) {
             el.addEventListener("click", function () {
-/*                ToggleEditProfile() {*/
-                    let targetSelector = ".jsProfileContainerEdit"; //$(this).data('bs-target');
+                    let targetSelector = ".jsProfileContainerEdit";
                     let container = document.querySelector(targetSelector);
 
                     if (!container.classList.contains('active')) {
@@ -46,13 +45,12 @@ export default class MyProfile {
                             once: true
                         });
                     }
-                //}
             })
         })
     }
 
     ToggleEditProfile() {
-        let targetSelector = ".jsProfileContainerEdit"; //$(this).data('bs-target');
+        let targetSelector = ".jsProfileContainerEdit";
         let container = document.querySelector(targetSelector);
 
         if (!container.classList.contains('active')) {
@@ -105,8 +103,6 @@ export default class MyProfile {
 
                 inst.saveProfile(options);
                 inst.ToggleEditProfile();
-                //$(this).parents('.jsProfileContainerEdit').first().fadeToggle();
-
                 return false;
             });
 

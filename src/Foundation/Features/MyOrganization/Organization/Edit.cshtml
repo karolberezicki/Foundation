@@ -80,7 +80,6 @@
             </div>
             <div class="col-8 form-group">
                 @Html.DisplayFor(x => x.Organization.Address.CountryOptions, "CountryOptions", new { Name = "Organization.Address.CountryCode", SelectItem = Model.Organization.Address.CountryCode })
-                @*@Html.DropDownListFor(x => x.Organization.Address.CountryCode, new SelectList(Model.Organization.Address.CountryOptions, "Code", "Name", Model.Organization.Address.CountryCode), new { @class = "select-menu" })*@
                 @Html.ValidationMessageFor(x => x.Organization.Address.CountryCode)
             </div>
         </div>
