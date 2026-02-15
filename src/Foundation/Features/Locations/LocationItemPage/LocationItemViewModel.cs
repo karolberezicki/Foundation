@@ -13,7 +13,6 @@ public class LocationItemViewModel : ContentViewModel<LocationItemPage>
     public ImageData Image { get; set; }
     public LocationNavigationModel LocationNavigation { get; set; }
     public IEnumerable<LocationItemPage> SimilarLocations { get; set; }
-    //public IEnumerable<StandardCategory> Tags { get; set; }
 }
 
 public class LocationNavigationModel

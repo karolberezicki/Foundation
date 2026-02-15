@@ -388,8 +388,6 @@ public class DefaultCartController : PageController<CartPage>
         }
         var order = _checkoutService.PlaceOrder(CartWithValidationIssues.Cart, new ModelStateDictionary(), new CheckoutViewModel());
 
-        //await _checkoutService.CreateOrUpdateBoughtProductsProfileStore(CartWithValidationIssues.Cart);
-        //await _checkoutService.CreateBoughtProductsSegments(CartWithValidationIssues.Cart);
         await _recommendationService.TrackOrder(HttpContext, order);
 
         var referencePages = _settingsService.GetSiteSettings<ReferencePageSettings>();
@@ -588,7 +586,6 @@ public class DefaultCartController : PageController<CartPage>
             }
         }
         var trackingResponse = await _recommendationService.TrackCart(HttpContext, CartWithValidationIssues.Cart);
-        //model.Recommendations = trackingResponse.GetCartRecommendations(_referenceConverter);
         var viewModel = _cartViewModelFactory.CreateLargeCartViewModel(CartWithValidationIssues.Cart, null);
 
         if (param.RequestFrom == "changeSizeItem")
@@ -738,9 +735,6 @@ public class DefaultCartController : PageController<CartPage>
             _cart = null;
         }
 
-        //var viewModel = _cartViewModelFactory.CreateLargeCartViewModel(CartWithValidationIssues.Cart, currentPage);
-        //var redirect = currentPage.LinkURL;
-        //return Json(redirect);
         return Json(new ChangeCartJsonResult
         {
             StatusCode = 1,

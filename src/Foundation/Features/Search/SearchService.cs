@@ -57,7 +57,6 @@ public class SearchService : ISearchService
     private readonly IClient _findClient;
     private readonly IFacetRegistry _facetRegistry;
     private const int DefaultPageSize = 18;
-    //private readonly IFindUIConfiguration _findUIConfiguration;
     private readonly ReferenceConverter _referenceConverter;
     private readonly IContentRepository _contentRepository;
     private readonly IPriceService _priceService;
@@ -72,7 +71,6 @@ public class SearchService : ISearchService
         IContentLanguageAccessor contentLanguageAccessor,
         IClient findClient,
         IFacetRegistry facetRegistry,
-        //IFindUIConfiguration findUIConfiguration,
         ReferenceConverter referenceConverter,
         IContentRepository contentRepository,
         IPriceService priceService,
@@ -87,8 +85,6 @@ public class SearchService : ISearchService
         _contentLanguageAccessor = contentLanguageAccessor;
         _findClient = findClient;
         _facetRegistry = facetRegistry;
-        //_findUIConfiguration = findUIConfiguration;
-        //_findClient.Personalization().Refresh();
         _referenceConverter = referenceConverter;
         _contentRepository = contentRepository;
         _priceService = priceService;
@@ -133,7 +129,6 @@ public class SearchService : ISearchService
 
         return new List<SortOrder>
         {
-            //new SortOrder {Name = ProductSortOrder.PriceAsc, Key = IndexingHelper.GetPriceField(market.MarketId, currency), SortDirection = SortDirection.Ascending},
             new SortOrder {Name = ProductSortOrder.Popularity, Key = "", SortDirection = SortDirection.Ascending},
             new SortOrder {Name = ProductSortOrder.NewestFirst, Key = "created", SortDirection = SortDirection.Descending}
         };
@@ -698,12 +693,6 @@ public class SearchService : ISearchService
             query = query.OrderByDescending(x => x.DisplayName);
             return query;
         }
-
-        //if (CommerceFilterOptionViewModel.Sort.Equals("Recommended"))
-        //{
-        //    query = query.UsingPersonalization();
-        //    return query;
-        //}
 
         return query;
     }

@@ -50,8 +50,6 @@ public class Initialize : IConfigurableModule
 
     void IInitializableModule.Initialize(InitializationEngine context)
     {
-        //GlobalFilters.Filters.Add(new AJAXLocalizationFilterAttribute());
-
         var associationDefinitionRepository = context.Locate.Advanced.GetInstance<GroupDefinitionRepository<AssociationGroupDefinition>>();
         associationDefinitionRepository.Add(new AssociationGroupDefinition { Name = "Accessory" });
         associationDefinitionRepository.Add(new AssociationGroupDefinition { Name = "Part" });

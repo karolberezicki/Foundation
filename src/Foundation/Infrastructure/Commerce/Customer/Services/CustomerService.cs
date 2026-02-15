@@ -216,7 +216,6 @@ public class CustomerService : ICustomerService
     public virtual async Task SignOutAsync()
     {
         await SignInManager().SignOutAsync();
-        //TrackingCookieManager.SetTrackingCookie(Guid.NewGuid().ToString());
     }
 
     private void SetPreferredAddresses(CustomerContact contact)
@@ -280,14 +279,6 @@ public class CustomerService : ICustomerService
         contact.Email = user.Email;
         contact.UserId = user.Email;
         contact.RegistrationSource = user.RegistrationSource;
-
-        //if (user.Addresses != null && user.Addresses.Any())
-        //{
-        //    foreach (var address in user.Addresses)
-        //    {
-        //        contact.Contact.AddContactAddress(address);
-        //    }
-        //}
 
         contact.SaveChanges();
 

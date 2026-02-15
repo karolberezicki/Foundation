@@ -71,8 +71,6 @@ public class LocationItemPage : FoundationPageData
 
     public List<string> TagString()
     {
-        //var repo = EPiServer.ServiceLocation.ServiceLocator.Current.GetInstance<IContentRepository>();
-        //return Categories?.Select(category => repo.Get<StandardCategory>(category).Name).ToList();
         return new List<string>();
     }
 

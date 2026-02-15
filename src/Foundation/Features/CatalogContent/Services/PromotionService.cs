@@ -96,7 +96,6 @@ public class PromotionService : IPromotionService
                 }
                 else
                 {
-                    // lineItemCalculator.GetExtendedPrice(lineItem, marketCurrency).Amount;
                     decimal amount = PriceCalculationService.GetSalePrice(lineItem.Code, market.MarketId, marketCurrency).UnitPrice.Amount;
                     dictionary.Add(lineItem.Code, amount - rewardDescription.SavedAmount);
                 }

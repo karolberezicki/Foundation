@@ -105,7 +105,6 @@ public static class EntryContentBaseExtensions
 
     public static IEnumerable<Price> Prices(this EntryContentBase entryContentBase)
     {
-        //var market = MarketService.Value.GetAllMarkets().FirstOrDefault(x => x.DefaultLanguage.Name.Equals(entryContentBase.Language.Name));
         var market = CurrentMarket.Value.GetCurrentMarket();
 
         if (market == null)

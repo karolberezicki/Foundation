@@ -42,7 +42,6 @@ public class StandardCategoryViewComponent : ViewComponent
         }
 
         var regexPattern = new StringBuilder(@"<span[\s\W\w]*?classid=""");
-        //regexPattern.Append(DynamicContentFactory.Instance.DynamicContentId.ToString());
         regexPattern.Append(@"""[\s\W\w]*?</span>");
         previewText = Regex.Replace(previewText, regexPattern.ToString(), string.Empty, RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
